@@ -1,125 +1,176 @@
 import React from "react";
 import { Redirect } from "react-router-dom";
-import PageTop from "../../components/page-top/page-top.component";
 import authService from "../../services/auth.service";
 import postsService from "../../services/posts.service";
-import PostDetail from "../post-detail/post-detail";
-import PostEdit from "../post-edit/post-edit";
-import PostList from "../post-list/post-list";
+import PostDetail from "../../components/post-detail/post-detail";
+import PostEdit from "../../components/post-edit/post-edit";
+import PostList from "../../components/post-list/post-list";
 import "./posts.page.scss";
 
 class PostListPage extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      posts: [],
-      selectedPost: null,
-      inEditPost: null,
-      redirectTo: null,
-      search: "",
-    };
-    this.searchTimer = null;
-  }
+	constructor(props) {
+		super(props);
+		this.state = {
+			posts: [],
+			selectedPost: null,
+			inEditPost: null,
+			redirectTo: null,
+			search: "",
+		};
+		this.searchTimer = null;
+	}
 
-  componentDidMount() {
-    let userData = authService.getLoggedUser();
-    if (!userData) {
-      this.setState({ redirectTo: "/login" });
-    } else {
-      this.loadPosts();
-    }
-  }
+	componentDidMount() {
+		let userData = authService.getLoggedUser();
+		if (!userData) {
+			this.setState({ redirectTo: "/login" });
+		} else {
+			this.loadPosts();
+		}
+	}
 
-  handleSearchChange(value) {
-    this.setState({ search: value }, () => {
-      this.searchPosts(value);
-    });
-  }
+	async loadPosts(query) {
+		try {
+			let res = await postsService.list(query);
+			this.setState({ posts: res.data.data });
+		} catch (error) {
+			console.log(error);
+			alert("Não foi possível listar os posts.");
+		}
+	}
 
-  searchPosts(search) {
-    if (this.searchTimer != null) {
-      clearTimeout(this.searchTimer);
-    }
+	async deletePost(postId) {
+		if (!window.confirm("Deseja realmente excluir este post?")) return;
+		try {
+			await postsService.delete(postId);
+			alert("Post excluído com sucesso");
+			
+			// After Delete
+			this.setState({ inEditPost: null, selectedPost: null })
+			this.loadPosts()
+		} catch (error) {
+			console.log(error);
+			alert("Não foi excluir o post.");
+		}
+	}
 
-    this.searchTimer = setTimeout(() => {
-      if (search != "") {
-        this.loadPosts({ search });
-      } else {
-        this.loadPosts();
-      }
-    }, 500);
-  }
+	async savePost(data) {
 
-  async deletePost(postId) {
-    if (!window.confirm("Deseja realmente excluir este post?")) return;
-    try {
-      await postsService.delete(postId);
-      alert("Post excluído com sucesso");
-    } catch (error) {
-      console.log(error);
-      alert("Não foi excluir o post.");
-    }
-  }
+		// Realizando verificações
+		if (!data.title || data.title === '') {
+			alert("Título é obrigatório!")
+			return;
+		}
+		if (!data.content || data.content === '') {
+			alert("Conteúdo é obrigatório!")
+			return;
+		}
+		if (!data.imageUrl || data.imageUrl === '') {
+			alert("Imagem URl é obrigatório!")
+			return;
+		}
 
-  async loadPosts(query) {
-    try {
-      let res = await postsService.list(query);
-      this.setState({ posts: res.data.data });
-    } catch (error) {
-      console.log(error);
-      alert("Não foi possível listar os posts.");
-    }
-  }
+		try {
+			// Caso seja uma edição, chamar o "edit" do serviço
+			if (data.id) {
+				await postsService.edit(data, data.id)
+				alert("Post editado com sucesso!")
+			}
+			// Caso seja uma adição, chamar o "create" do serviço
+			else {
+				await postsService.create(data)
+				alert("Post criado com sucesso!")
+			}
 
-   // // Função que exclui o post, chamada ao clicar no botão "Excluir"
-    // const deletePost = useCallback((postId) => {
-        
-    //     if (!window.confirm("Deseja realmente excluir este post?")) return;
+			// After save
+			this.setState({ inEditPost: null, selectedPost: null })
+			this.loadPosts()
 
-    //     postsService.delete(postId)
-    //         .then(res => {
-    //             alert("Post excluído com sucesso")
-    //             props.history.replace('/post-list')
-    //         })
-    //         .catch(error => {
-    //             console.log(error);
-    //             alert("Não foi excluir o post.")
-    //         })
+		} catch (error) {
+			console.log(error)
+			alert("Erro ao criar post.")
+		}
+	}
 
-    // }, [])
+	handleSearchChange(value) {
+		this.setState({ search: value }, () => {
+			this.searchPosts(value);
+		});
+	}
 
-  selectPost(selectedPost){
-    this.setState({selectedPost})
-  }
-  editPost(inEditPost){
-    this.setState({inEditPost})
-  }
+	searchPosts(search) {
+		if (this.searchTimer != null) {
+			clearTimeout(this.searchTimer);
+		}
 
-  render() {
-    const { posts, selectedPost, redirectTo, inEditPost } = this.state;
+		this.searchTimer = setTimeout(() => {
+			if (search != "") {
+				this.loadPosts({ search });
+			} else {
+				this.loadPosts();
+			}
+		}, 500);
+	}
 
-    if (redirectTo) {
-      return <Redirect to={redirectTo} />;
-    }
+	selectPost(selectedPost) {
+		this.setState({ selectedPost, inEditPost: null })
+	}
 
-    return (
-        <div className="post-grid">
-          <div className="post-grid__col">
-            <PostList posts={posts} selectPost={(post) => this.selectPost(post)}/>
-          </div>
-          {selectedPost ? (
-            <div className="post-grid__col">
-              <PostDetail post={selectedPost} editPost={(post) => this.editPost(post)}/>
-            </div>
-          ) : null }
-          {inEditPost ? (
-            <div className="post-grid__col">
-              <PostEdit post={inEditPost}/>
-            </div>
-          ) : null }
-        </div>
-    )
-  }
+	editPost(inEditPost) {
+		this.setState({ inEditPost })
+	}
+
+	addPost() {
+		this.setState({ selectedPost: null, inEditPost: {} })
+	}
+
+	render() {
+
+		const {
+			posts,
+			selectedPost,
+			redirectTo,
+			inEditPost,
+			search
+		} = this.state;
+
+		if (redirectTo) {
+			return <Redirect to={redirectTo} />;
+		}
+
+		return (
+			<div className="post-grid">
+				<div className="post-grid__col">
+					<PostList
+						posts={posts}
+						selectPost={(post) => this.selectPost(post)}
+						search={search}
+						onSearch={(value) => this.handleSearchChange(value)}
+						addPost={() => this.addPost()}
+					/>
+				</div>
+				{selectedPost ? (
+					<div className="post-grid__col">
+						<PostDetail
+							post={selectedPost}
+							editPost={(post) => this.editPost(post)}
+							deletePost={(postId) => this.deletePost(postId)}
+							onClose={() => this.setState({ selectedPost: null })}
+						/>
+					</div>
+				) : null}
+				{inEditPost ? (
+					<div className="post-grid__col">
+						<PostEdit
+							post={inEditPost}
+							onSave={(post) => this.savePost(post)}
+							onCancel={() => this.setState({ inEditPost: null })}
+						/>
+					</div>
+				) : null}
+			</div>
+		)
+	}
 }
 
 export default PostListPage;

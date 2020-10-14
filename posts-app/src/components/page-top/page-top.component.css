@@ -14,14 +14,15 @@
 
 .page-top__title h2{
     color: #333;
-    font-size: 32px;
+    font-size: 22px;
     font-weight: bold;
     margin: 0;
+    margin-bottom: 6px;
 }
 
 .page-top__title p{
     color: #666;
-    font-size: 18px;
+    font-size: 16px;
     margin: 0;
 }
 

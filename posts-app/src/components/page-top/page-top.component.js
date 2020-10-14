@@ -3,7 +3,6 @@ import './page-top.component.css'
 
 class PageTop extends React.Component{
 
-
     render(){
         return(
             <div className="page-top">
