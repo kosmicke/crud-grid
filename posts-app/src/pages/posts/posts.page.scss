@@ -1,0 +1,16 @@
+.post-grid{
+    display: flex;
+    height: 100%;
+}
+
+.post-grid__col{
+    flex: 1;
+    max-width: 40%;
+    height: 100%;
+    padding: 16px;
+    overflow: scroll;
+    border: 1px solid #DDD;
+    &:not(:last-child){
+        border-right: none;
+    }
+}

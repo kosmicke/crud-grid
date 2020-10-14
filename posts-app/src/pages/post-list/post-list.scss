@@ -1,0 +1,29 @@
+.post-list{
+    width: 100%;
+    height: 100%;
+}
+
+.post-item{
+    display: flex;
+    flex-direction: column; 
+    padding: 16px;
+    cursor: pointer;
+    border: 1px solid #DDD;
+    &:not(:last-child){
+        border-bottom: none;
+    }
+    h3, p {
+        margin: 0;
+    }
+    h3{
+        color: #333;
+        font-size: 22px;
+        font-weight: bold;
+        margin-bottom: 4px;
+    }
+    p{
+        color: #666;
+        font-size: 14px;
+        font-weight: normal;
+    }
+}
