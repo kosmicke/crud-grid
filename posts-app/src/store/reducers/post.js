@@ -1,3 +1,5 @@
+import { v4 as uuidv4 } from 'uuid';
+
 const INITIAL_STATE = {
     posts: [],
     selectedPost: null,
@@ -29,12 +31,13 @@ const post = (state = INITIAL_STATE, action ) => {
     }
 
     if(action.type == "SAVE_POST"){
-        const post = action.payload.post;
+        let post = action.payload.post;
         let posts = [...state.posts];
         if(post.id){
             posts = posts.filter(item => item.id != post.id )
             posts = [...posts, post]
         }else{
+            post.id = uuidv4();
             posts = [...posts, post]
         }
         return {...state, posts, inEditPost : null, selectedPost: null}
