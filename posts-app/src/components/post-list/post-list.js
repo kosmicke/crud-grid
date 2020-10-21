@@ -1,12 +1,17 @@
-import React from "react";
+import React, { useEffect } from "react";
 import PageTop from "../../components/page-top/page-top.component";
 import "./post-list.scss";
 
-const PostList = ({ posts, search, onSearch, selectPost, addPost }) => {
+import * as PostActions from '../../store/actions/post';
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
+
+const PostList = ({ posts, search, selectPost, editPost, loadPosts }) => {
+
 	return (
 		<div className="post-list">
 			<PageTop title="Posts" desc="Todos os posts">
-				<button className="btn btn-primary" onClick={() => addPost()}>
+				<button className="btn btn-primary" onClick={() => editPost({})}>
 					Adicionar
 				</button>
 			</PageTop>
@@ -17,11 +22,11 @@ const PostList = ({ posts, search, onSearch, selectPost, addPost }) => {
 					id="search"
 					placeholder="Digite para buscar"
 					value={search}
-					onChange={(e) => onSearch(e.target.value)}
+					onChange={(e) => loadPosts(e.target.value)}
 				/>
 			</div>
 			{posts.map(post => (
-				<div className="post-item" key={post.id} onClick={() => selectPost(post)}>
+				<div key={post.id} className="post-item" key={post.id} onClick={() => selectPost(post)}>
 					<h3>
 						{post.title}
 					</h3>
@@ -34,4 +39,10 @@ const PostList = ({ posts, search, onSearch, selectPost, addPost }) => {
 	)
 }
 
-export default PostList;
+const mapStateToProps = state => ({ 
+	posts : state.post.posts,
+	search:  state.post.search,
+	selectedPost: state.post.selectedPost,
+})
+const mapDispatchToProps = dispatch => bindActionCreators(PostActions, dispatch)
+export default connect(mapStateToProps, mapDispatchToProps)(PostList)
