@@ -8,6 +8,7 @@ import PostList from "../../components/post-list/post-list";
 import "./posts.page.scss";
 
 class PostListPage extends React.Component {
+	
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -141,6 +142,15 @@ class PostListPage extends React.Component {
 		return (
 			<div className="post-grid">
 				<div className="post-grid__col">
+					<PostList />
+				</div>
+				<div className="post-grid__col">
+					<PostDetail />
+				</div>
+				<div className="post-grid__col">
+					<PostEdit />
+				</div>
+				{/* <div className="post-grid__col">
 					<PostList
 						posts={posts}
 						selectPost={(post) => this.selectPost(post)}
@@ -167,7 +177,7 @@ class PostListPage extends React.Component {
 							onCancel={() => this.setState({ inEditPost: null })}
 						/>
 					</div>
-				) : null}
+				) : null} */}
 			</div>
 		)
 	}

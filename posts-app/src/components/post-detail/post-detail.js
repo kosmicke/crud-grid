@@ -2,7 +2,13 @@ import React from 'react';
 import PageTop from '../../components/page-top/page-top.component';
 import './post-detail.scss';
 
-const PostDetail = ({post, editPost, deletePost, onClose}) => {
+import { connect } from "react-redux";
+
+const PostDetail = ({ post, editPost, deletePost, onClose}) => {
+
+    if(!post){
+        return null;
+    }
 
     return (
 
@@ -50,4 +56,8 @@ const PostDetail = ({post, editPost, deletePost, onClose}) => {
 
 }
 
-export default PostDetail
+const mapStateToProps = (state) => ({
+    post : state.post.selectedPost,
+})
+
+export default connect(mapStateToProps)(PostDetail)
