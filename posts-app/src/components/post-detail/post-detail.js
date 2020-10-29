@@ -1,10 +1,10 @@
 import React from 'react';
 import PageTop from '../../components/page-top/page-top.component';
 import './post-detail.scss';
-
 import { connect } from "react-redux";
+import * as PostsActions from "../../store/actions/post"
 
-const PostDetail = ({ post, editPost, deletePost, onClose}) => {
+const PostDetail = ({ post, close, editPost, deletePost}) => {
 
     if(!post){
         return null;
@@ -15,7 +15,7 @@ const PostDetail = ({ post, editPost, deletePost, onClose}) => {
         <div className="container">
             
             <PageTop title="Post" desc="Detalhes do post">
-				<button className="btn btn-default" onClick={() => onClose()}>
+				<button className="btn btn-default" onClick={() => close()}>
 					Fechar
 				</button>
 			</PageTop>
@@ -39,7 +39,7 @@ const PostDetail = ({ post, editPost, deletePost, onClose}) => {
                         <button
                             type="button"
                             className="btn btn-sm btn-outline-danger"
-                            onClick={() => deletePost(post.id)}>
+                            onClick={() => deletePost(post)}>
                             Excluir
                         </button>
                         <button
@@ -60,4 +60,11 @@ const mapStateToProps = (state) => ({
     post : state.post.selectedPost,
 })
 
-export default connect(mapStateToProps)(PostDetail)
+const mapDispatchToProps = (dispatch) => {
+    return {
+        close : () => dispatch(PostsActions.selectPost(null)),
+        editPost: (post) => dispatch(PostsActions.editPost(post)),
+        deletePost: (post) => dispatch(PostsActions.deletePost(post)),
+    }
+}
+export default connect(mapStateToProps, mapDispatchToProps)(PostDetail)

@@ -127,13 +127,7 @@ class PostListPage extends React.Component {
 
 	render() {
 
-		const {
-			posts,
-			selectedPost,
-			redirectTo,
-			inEditPost,
-			search
-		} = this.state;
+		const { redirectTo } = this.state;
 
 		if (redirectTo) {
 			return <Redirect to={redirectTo} />;
@@ -150,34 +144,6 @@ class PostListPage extends React.Component {
 				<div className="post-grid__col">
 					<PostEdit />
 				</div>
-				{/* <div className="post-grid__col">
-					<PostList
-						posts={posts}
-						selectPost={(post) => this.selectPost(post)}
-						search={search}
-						onSearch={(value) => this.handleSearchChange(value)}
-						addPost={() => this.addPost()}
-					/>
-				</div>
-				{selectedPost ? (
-					<div className="post-grid__col">
-						<PostDetail
-							post={selectedPost}
-							editPost={(post) => this.editPost(post)}
-							deletePost={(postId) => this.deletePost(postId)}
-							onClose={() => this.setState({ selectedPost: null })}
-						/>
-					</div>
-				) : null}
-				{inEditPost ? (
-					<div className="post-grid__col">
-						<PostEdit
-							post={inEditPost}
-							onSave={(post) => this.savePost(post)}
-							onCancel={() => this.setState({ inEditPost: null })}
-						/>
-					</div>
-				) : null} */}
 			</div>
 		)
 	}

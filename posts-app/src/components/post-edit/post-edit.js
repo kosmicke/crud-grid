@@ -1,11 +1,17 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import PageTop from '../../components/page-top/page-top.component';
 import './post-edit.scss';
 import { connect } from 'react-redux';
 
-const PostEdit = ({ inEditPost }) => {
+import * as PostsActions from "../../store/actions/post";
+
+const PostEdit = ({ inEditPost, cancelEdit, savePost }) => {
 
     const [post, setPost] = useState(inEditPost || {});
+
+    useEffect(() => {
+        setPost(inEditPost || {})
+    }, [inEditPost])
 
     if(!inEditPost){
         return null;
@@ -18,10 +24,10 @@ const PostEdit = ({ inEditPost }) => {
         <div className="container">
 
             <PageTop title={title} desc={desc}>
-                <button className="btn btn-light" onClick={() => this.props.onCancel()}>
+                <button className="btn btn-light" onClick={() => cancelEdit()}>
                     Cancelar
                 </button>
-                <button className="btn btn-primary" onClick={() => this.props.onSave(this.state)}>
+                <button className="btn btn-primary" onClick={() => savePost(post)}>
                     Salvar
                 </button>
             </PageTop>
@@ -65,4 +71,11 @@ const mapStateToProps = (state) => ({
     inEditPost : state.post.inEditPost
 })
 
-export default connect(mapStateToProps)(PostEdit);
+const mapDispatchToProps = (dispatch) => {
+    return {
+        cancelEdit : () => dispatch(PostsActions.cancelEdit()),
+        savePost : (post) => dispatch(PostsActions.savePost(post)),
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(PostEdit);

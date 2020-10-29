@@ -2,27 +2,20 @@ import React from "react";
 import PageTop from "../../components/page-top/page-top.component";
 import "./post-list.scss";
 import { connect } from "react-redux";
+import * as PostsActions from '../../store/actions/post';
 
-const editPost = (post) => {
-	return {
-		type : "EDIT_POST",
-		payload: { post }
+
+const PostList = ({ posts, search, selectPost, editPost, loadPosts }) => {
+
+	let filteredPosts = posts;
+	if(search && search != ""){
+		filteredPosts = posts.filter(item => item.title.includes(search))
 	}
-}
-
-const selectPost = (post) => {
-	return {
-		type : "SELECT_POST",
-		payload: { post }
-	}
-}
-
-const PostList = ({ posts, search, onSearch, dispatch }) => {
 
 	return (
 		<div className="post-list">
 			<PageTop title="Posts" desc="Todos os posts">
-				<button className="btn btn-primary" onClick={() => dispatch(editPost({}))}>
+				<button className="btn btn-primary" onClick={() => editPost({})}>
 					Adicionar
 				</button>
 			</PageTop>
@@ -33,11 +26,11 @@ const PostList = ({ posts, search, onSearch, dispatch }) => {
 					id="search"
 					placeholder="Digite para buscar"
 					value={search}
-					onChange={(e) => onSearch(e.target.value)}
+					onChange={(e) => loadPosts(e.target.value)}
 				/>
 			</div>
-			{posts.map(post => (
-				<div className="post-item" key={post.id} onClick={() => dispatch(selectPost(post))}>
+			{filteredPosts.map(post => (
+				<div className="post-item" key={post.id} onClick={() => selectPost(post)}>
 					<h3>
 						{post.title}
 					</h3>
@@ -50,11 +43,19 @@ const PostList = ({ posts, search, onSearch, dispatch }) => {
 	)
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
 	return {
 		posts: state.post.posts,
 		search: state.post.search
 	}
 }
 
-export default connect(mapStateToProps)(PostList);
+const mapDispatchtoProps = (dispatch) => {
+	return {
+		selectPost : (post) => dispatch(PostsActions.selectPost(post)),
+		editPost : (post) => dispatch(PostsActions.editPost(post)),
+		loadPosts: (search) => dispatch(PostsActions.loadPosts(search))
+	}
+}
+
+export default connect(mapStateToProps, mapDispatchtoProps)(PostList);
